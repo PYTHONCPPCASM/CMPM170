@@ -58,6 +58,9 @@ llllll
 `
 ];
 
+
+let player;
+
   const G = {
     WIDTH: 100,
     HEIGHT: 150,
@@ -87,37 +90,7 @@ options = {
   isReplayEnabled: true
 };
 
-let player;
-let bar1;
-let x = 0;
-let y = 0;
-let yellow;
-let count = 1;
-let bar2;
-let SPEED = 1;
-let timer = 0;
-let energy = 10;
-let angle = 0;
-let missed = 0;
 
-player = {
-  pos: vec(G.WIDTH / 2, G.HEIGHT / 2)
-};
-
-bar1 = {
-  pos: vec(20, 20)
-}
-
-bar2 = {
-  pos: vec(20, 20)
-}
-
-yellow = {
-  pos: vec(0, 0)
-}
-
-bar1 = [];
-bar2 = [];
 function update() {
   if (!ticks) {
     SPEED = 1;
@@ -125,8 +98,25 @@ function update() {
     missed = 0;
   }
 
+  color("yellow");
+
+  player = {
+    pos: vec(G.WIDTH / 2, G.HEIGHT / 2)
+  }
+
   arc(50, 50, 5, 2, 0, 180);
+
+  player.pos = vec(input.pos.x, input.pos.y);
+  player.pos.clamp(0, G.WIDTH, 0, G.HEIGHT);
+  char("b", player.pos);
+
+  box(vec(50, 50), 3);
   
+  if(char("b", player.pos).isColliding.rect.yellow && input.isPressed){  
+    color("black");
+    bar(50, 50, 20, 2, 4);
+    bar(50, 50, 20, 2, -4);
+  }  
 
 }
 
