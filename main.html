@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>crisp-game-lib</title>
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height,
+    user-scalable=no, initial-scale=1, maximum-scale=1"
+    />
+    <script src="https://unpkg.com/sounds-some-sounds@1.0.5/build/index.js"></script>
+    <script src="https://unpkg.com/gif-capture-canvas@1.1.0/build/index.js"></script>
+    <script src="https://unpkg.com/terser@4.6.11/dist/bundle.min.js"></script>
+    <script src="https://unpkg.com/pixi.js@5.3.0/dist/pixi.min.js"></script>
+    <script src="https://unpkg.com/pixi-filters@3.1.1/dist/pixi-filters.js"></script>
+    <script>
+      var module = {};
+    </script>
+    <script src="https://unpkg.com/lodash.clonedeep@4.5.0/index.js"></script>
+    <script src="https://abagames.github.io/crisp-game-lib/bundle.js"></script>
+
+<script>
+title = "BULLET TIME";
+
+description = `
+  HOLD TO ACTIVATE BULLET TIME USING ENERGY
+`;
+
+characters = [
+`
+l cc l
+lccccl
+  cc  
+l cc l
+lccccl
+l ll l
+`,
+`
+rr  rr
+rrrrrr
+rrpprr
+rrrrrr
+  rr
+  rr
+`,`
+y  y
+yyyyyy
+ y  y
+yyyyyy
+ y  y
+`,`
+  ll
+ llll
+ llll
+llllll
+llllll
+ llll  
+`
+];
+
+  const G = {
+    WIDTH: 100,
+    HEIGHT: 150,
+
+    STAR_SPEED_MIN: 0.5,
+    STAR_SPEED_MAX: 1.0,
+
+    PLAYER_FIRE_RATE: 4,
+    PLAYER_GUN_OFFSET: 3,
+    FBULLET_SPEED: 5,
+    
+    ENEMY_MIN_BASE_SPEED: 1.0,
+    ENEMY_MAX_BASE_SPEED: 2.0,
+    ENEMY_FIRE_RATE: 45,
+
+    EBULLET_SPEED: 2.0,
+    EBULLET_ROTATION_SPD: 0.1,
+
+    SPINNING : 10
+
+  };
+
+options = {
+  viewSize: {x: G.WIDTH, y: G.HEIGHT},
+  seed : 45,
+  isPlayingBgm: true,
+  isReplayEnabled: true
+};
+
+let player;
+let bar1;
+let x = 0;
+let y = 0;
+let yellow;
+let count = 1;
+let bar2;
+let SPEED = 1;
+let timer = 0;
+let energy = 10;
+let angle = 0;
+let missed = 0;
+
+player = {
+  pos: vec(G.WIDTH / 2, G.HEIGHT / 2)
+};
+
+bar1 = {
+  pos: vec(20, 20)
+}
+
+bar2 = {
+  pos: vec(20, 20)
+}
+
+yellow = {
+  pos: vec(0, 0)
+}
+
+bar1 = [];
+bar2 = [];
+function update() {
+  if (!ticks) {
+    SPEED = 1;
+    energy = 10;
+    missed = 0;
+  }
+
+  arc(50, 50, 5, 2, 0, 180);
+  
+
+}
+
+
+function abs(a){
+  if(a < 0){
+    a *= -1;
+  } else {
+    return a;
+  }
+  return a;
+}
+
+addEventListener("load", onLoad);
+</script>
+
+  </head>
+  <body style="background: #ddd"></body>
+</html>
