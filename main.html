@@ -90,6 +90,12 @@ options = {
   isReplayEnabled: true
 };
 
+  let list;
+  list = [];
+
+  player = {
+    pos: vec(G.WIDTH / 2, G.HEIGHT / 2)
+  }
 
 function update() {
   if (!ticks) {
@@ -98,25 +104,36 @@ function update() {
     missed = 0;
   }
 
-  color("yellow");
-
-  player = {
-    pos: vec(G.WIDTH / 2, G.HEIGHT / 2)
-  }
-
-  arc(50, 50, 5, 2, 0, 180);
-
   player.pos = vec(input.pos.x, input.pos.y);
   player.pos.clamp(0, G.WIDTH, 0, G.HEIGHT);
   char("b", player.pos);
 
-  box(vec(50, 50), 3);
-  
-  if(char("b", player.pos).isColliding.rect.yellow && input.isPressed){  
-    color("black");
-    bar(50, 50, 20, 2, 4);
-    bar(50, 50, 20, 2, -4);
-  }  
+//constantly filling the list
+  if(list.length === 0){
+    for(let i = 0; i < 1; i++){
+      const posX = rnd(0, 100);
+      list.push({pos: vec(posX, 30)});
+    }
+  }
+
+  remove(list, (l)=>{
+
+    color("green");
+    arc(l.pos.x, l.pos.y, 10, 10, 180);
+    l.pos.y += SPEED;
+
+    if((char("b", player.pos).isColliding.rect.green) && input.isPressed){
+      energy++;
+      play("jump");
+    }
+
+    if(l.pos.y > G.HEIGHT){
+      missed += 1;
+      play("powerUp");
+    }
+
+    return l.pos.y > G.HEIGHT || (char("b", player.pos).isColliding.rect.green && input.isPressed);
+  });
 
 }
 
