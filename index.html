@@ -20,49 +20,25 @@
     <script src="https://abagames.github.io/crisp-game-lib/bundle.js"></script>
 
 <script>
-title = "BULLET TIME";
+title = "Osu2.0";
 
 description = `
-  HOLD TO ACTIVATE BULLET TIME USING ENERGY
+  Click On Circles.
 `;
 
 characters = [
 `
-l cc l
-lccccl
-  cc  
-l cc l
-lccccl
-l ll l
-`,
-`
-rr  rr
-rrrrrr
-rrpprr
-rrrrrr
-  rr
-  rr
-`,`
-y  y
-yyyyyy
- y  y
-yyyyyy
- y  y
-`,`
-  ll
- llll
- llll
-llllll
-llllll
- llll  
+ rrr
+rrrrr
+rrrrr
+ rrr
 `
 ];
-
 
 let player;
 
   const G = {
-    WIDTH: 100,
+    WIDTH: 150,
     HEIGHT: 150,
 
     STAR_SPEED_MIN: 0.5,
@@ -79,23 +55,36 @@ let player;
     EBULLET_SPEED: 2.0,
     EBULLET_ROTATION_SPD: 0.1,
 
-    SPINNING : 10
+    SPINNING : 10,
 
+    // Game Text settings
+    MULTIPLIER : 1,
+    LIFELINE: 100,
+
+    //timer for circle
+    TIMER: 150
   };
 
 options = {
   viewSize: {x: G.WIDTH, y: G.HEIGHT},
-  seed : 45,
+  seed : 1337,
   isPlayingBgm: true,
-  isReplayEnabled: true
+  isReplayEnabled: true,
+  theme: "dark"
 };
 
   let list;
   list = [];
 
   player = {
-    pos: vec(G.WIDTH / 2, G.HEIGHT / 2)
+    pos: vec(G.WIDTH / 2, G.HEIGHT / 2),
+    health: G.LIFELINE
   }
+
+  let healthText;
+  let timer = G.TIMER;
+  let timer2 = 200;
+  let thickness = 10;
 
 function update() {
   if (!ticks) {
@@ -104,47 +93,81 @@ function update() {
     missed = 0;
   }
 
+  // Game Text
+  color("red");
+  let multiX = text("x" + G.MULTIPLIER.toString(), 3, 10);
+  healthText = player.health.toString();
+  if (player.health < 100) {
+    healthText = healthText.slice(0, (healthText.indexOf(".")) + 2);
+  }
+  let healthB = text(healthText + "%", 120, 10);
+
+  // Updating and drawing the player
   player.pos = vec(input.pos.x, input.pos.y);
   player.pos.clamp(0, G.WIDTH, 0, G.HEIGHT);
-  char("b", player.pos);
+  char("a", player.pos);
 
-//constantly filling the list
-  if(list.length === 0){
-    for(let i = 0; i < 1; i++){
-      const posX = rnd(0, 100);
-      list.push({pos: vec(posX, 30)});
-    }
+  // Health maintenance
+  if (player.health >= 100) {
+    player.health = 100;
+  } else if (player.health > 0 && player.health < 100) {
+    player.health += 0.1;
+  } else {
+    end();
+    player.health = 100;
   }
 
-  remove(list, (l)=>{
+  // constantly filling the list
+  if(list.length === 0){
+    for(let i = 0; i < 1; i++){
+      const posX = rnd(20, 80);
+      const posY = rnd(20, 130);
+      list.push({pos: vec(posX, posY)});
+    }
+  }
+  
+  // Remove circles
+  remove(list, (l) => {
+    color("purple");
+    thickness -= 0.16;
+    arc(l.pos.x, l.pos.y, 10, thickness, 180);
+    
+    //transformation of circle in random movement
+    l.pos.x += 1;
+    l.pos.x += Math.sin(thickness) + difficulty;
 
-    color("green");
-    arc(l.pos.x, l.pos.y, 10, 10, 180);
-    l.pos.y += SPEED;
-
-    if((char("b", player.pos).isColliding.rect.green) && input.isPressed){
+    // Player circle click
+    if ((char("a", player.pos).isColliding.rect.purple) && input.isJustPressed){
       energy++;
       play("jump");
+      addScore(10 * G.MULTIPLIER, l.pos);
+      G.MULTIPLIER += 1;
+      thickness = 10;
     }
 
-    if(l.pos.y > G.HEIGHT){
+    // Reset score multiplier
+    if (input.isJustPressed && !((char("a", player.pos).isColliding.rect.purple))) {
+      
+      G.MULTIPLIER = 1;
+      if (player.health < 25) {
+        player.health = 0;
+      } else {
+        player.health -= 25;
+      }
+
+    }
+    
+    if (l.pos.y > G.HEIGHT) {
       missed += 1;
       play("powerUp");
     }
 
-    return l.pos.y > G.HEIGHT || (char("b", player.pos).isColliding.rect.green && input.isPressed);
+    if(thickness < -1){
+      thickness = 10;
+    }
+    return (char("a", player.pos).isColliding.rect.purple && input.isJustPressed) || thickness < 0;
   });
 
-}
-
-
-function abs(a){
-  if(a < 0){
-    a *= -1;
-  } else {
-    return a;
-  }
-  return a;
 }
 
 addEventListener("load", onLoad);
