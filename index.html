@@ -75,6 +75,8 @@ options = {
 
   let list;
   list = [];
+  let strips;
+  strips = [];
 
   player = {
     pos: vec(G.WIDTH / 2, G.HEIGHT / 2),
@@ -85,12 +87,22 @@ options = {
   let timer = G.TIMER;
   let timer2 = 200;
   let thickness = 10;
+  let size = 10;
 
 function update() {
   if (!ticks) {
     SPEED = 1;
     energy = 10;
     missed = 0;
+
+    strips = times(20, ()=>{
+      const posX = rnd(0, G.WIDTH);
+      const posY = rnd(0, G.HEIGHT);
+        return{
+          pos: vec(posX, posY),
+          speed: rnd(0.5, 1.0)
+        };
+    });
   }
 
   // Game Text
@@ -121,20 +133,33 @@ function update() {
   if(list.length === 0){
     for(let i = 0; i < 1; i++){
       const posX = rnd(20, 80);
-      const posY = rnd(20, 130);
+      const posY = rnd(20, 80);
       list.push({pos: vec(posX, posY)});
     }
   }
-  
-  // Remove circles
+
+
+
+  strips.forEach((s)=>{
+    box(s.pos, 1);
+    s.pos.x -= s.speed;
+    s.pos.wrap(0, G.WIDTH, 0, G.HEIGHT);
+    color("yellow");
+  });
+
+
+  // Remove circles 1 from left to right
   remove(list, (l) => {
+
     color("purple");
+    
     thickness -= 0.16;
-    arc(l.pos.x, l.pos.y, 10, thickness, 180);
+    size -= 0.16;
+    arc(l.pos.x, l.pos.y, size, thickness, 180);
     
     //transformation of circle in random movement
     l.pos.x += 1;
-    l.pos.x += Math.sin(thickness) + difficulty;
+    l.pos.x += Math.sin(thickness / 20) / 10;
 
     // Player circle click
     if ((char("a", player.pos).isColliding.rect.purple) && input.isJustPressed){
@@ -143,6 +168,7 @@ function update() {
       addScore(10 * G.MULTIPLIER, l.pos);
       G.MULTIPLIER += 1;
       thickness = 10;
+      size = 10;
     }
 
     // Reset score multiplier
@@ -157,16 +183,24 @@ function update() {
 
     }
     
-    if (l.pos.y > G.HEIGHT) {
+    if (l.pos.y > G.HEIGHT || l.pos.x > G.WIDTH) {
       missed += 1;
       play("powerUp");
     }
 
-    if(thickness < -1){
+    if(thickness < -1 || size < -1){
       thickness = 10;
+      size = 10;
     }
-    return (char("a", player.pos).isColliding.rect.purple && input.isJustPressed) || thickness < 0;
+
+    if(thickness < 0 || size < 0 || l.pos.x > G.WIDTH && !input.isPressed){
+      missed += 1;
+      console.log("missed = " + missed);
+    }
+
+    return (char("a", player.pos).isColliding.rect.purple && input.isJustPressed) || thickness < 0 || size < 0 || l.pos.x > G.WIDTH;
   });
+
 
 }
 
