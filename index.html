@@ -88,6 +88,7 @@ options = {
   let timer2 = 200;
   let thickness = 10;
   let size = 10;
+  let direction = 1;
 
 function update() {
   if (!ticks) {
@@ -138,8 +139,6 @@ function update() {
     }
   }
 
-
-
   strips.forEach((s)=>{
     box(s.pos, 1);
     s.pos.x -= s.speed;
@@ -147,6 +146,9 @@ function update() {
     color("yellow");
   });
 
+  if(input.isJustPressed){
+      direction *= -1;
+  }
 
   // Remove circles 1 from left to right
   remove(list, (l) => {
@@ -158,9 +160,15 @@ function update() {
     arc(l.pos.x, l.pos.y, size, thickness, 180);
     
     //transformation of circle in random movement
-    l.pos.x += 1;
-    l.pos.x += Math.sin(thickness / 20) / 10;
+    
+    
 
+    l.pos.x += Math.sin(thickness / 20) / 10;
+    l.pos.x += 1 * direction;
+
+    
+    
+    particle(player.pos);
     // Player circle click
     if ((char("a", player.pos).isColliding.rect.purple) && input.isJustPressed){
       energy++;
@@ -192,13 +200,13 @@ function update() {
       thickness = 10;
       size = 10;
     }
-
+    //if disappear and you did not click
     if(thickness < 0 || size < 0 || l.pos.x > G.WIDTH && !input.isPressed){
       missed += 1;
       console.log("missed = " + missed);
     }
 
-    return (char("a", player.pos).isColliding.rect.purple && input.isJustPressed) || thickness < 0 || size < 0 || l.pos.x > G.WIDTH;
+    return (char("a", player.pos).isColliding.rect.purple && input.isJustPressed) || thickness < 0 || size < 0 || l.pos.x > G.WIDTH || l.pos.x < 0;
   });
 
 
